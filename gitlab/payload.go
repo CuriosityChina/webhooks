@@ -30,6 +30,11 @@ func (t *customTime) UnmarshalJSON(b []byte) (err error) {
 	return
 }
 
+// BasicEventPayload
+type BasicEventPayload struct {
+	ObjectKind string `json:"object_kind"`
+}
+
 // IssueEventPayload contains the information for GitLab's issue event
 type IssueEventPayload struct {
 	ObjectKind       string           `json:"object_kind"`

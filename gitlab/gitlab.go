@@ -31,6 +31,7 @@ const (
 	WikiPageEvents           Event = "Wiki Page Hook"
 	PipelineEvents           Event = "Pipeline Hook"
 	BuildEvents              Event = "Build Hook"
+	SystemHookEvents         Event = "System Hook"
 )
 
 // Option is a configuration option for the webhook
@@ -160,6 +161,31 @@ func (hook Webhook) Parse(r *http.Request, events ...Event) (interface{}, error)
 		var pl BuildEventPayload
 		err = json.Unmarshal([]byte(payload), &pl)
 		return pl, err
+
+	case SystemHookEvents:
+		var bpl BasicEventPayload
+		err = json.Unmarshal([]byte(payload), &bpl)
+		if err != nil {
+			return nil, err
+		}
+		systemHookObjectKind := bpl.ObjectKind
+		switch systemHookObjectKind {
+		case "Push":
+			var pl PushEventPayload
+			err = json.Unmarshal([]byte(payload), &pl)
+			return pl, err
+		case "tag_push":
+			var pl TagEventPayload
+			err = json.Unmarshal([]byte(payload), &pl)
+			return pl, err
+		case "merge_request":
+			var pl MergeRequestEventPayload
+			err = json.Unmarshal([]byte(payload), &pl)
+			return pl, err
+		default:
+			return nil, fmt.Errorf("unknown system hook event %s", systemHookObjectKind)
+		}
+
 	default:
 		return nil, fmt.Errorf("unknown event %s", gitLabEvent)
 	}
