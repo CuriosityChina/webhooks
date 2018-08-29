@@ -168,9 +168,8 @@ func (hook Webhook) Parse(r *http.Request, events ...Event) (interface{}, error)
 		if err != nil {
 			return nil, err
 		}
-		systemHookObjectKind := bpl.ObjectKind
-		switch systemHookObjectKind {
-		case "Push":
+		switch bpl.ObjectKind {
+		case "push":
 			var pl PushEventPayload
 			err = json.Unmarshal([]byte(payload), &pl)
 			return pl, err
@@ -183,7 +182,7 @@ func (hook Webhook) Parse(r *http.Request, events ...Event) (interface{}, error)
 			err = json.Unmarshal([]byte(payload), &pl)
 			return pl, err
 		default:
-			return nil, fmt.Errorf("unknown system hook event %s", systemHookObjectKind)
+			return nil, fmt.Errorf("unknown system hook event %s", bpl.ObjectKind)
 		}
 
 	default:
